@@ -1,0 +1,2318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="csm" targetNamespace="csm">
+
+   <xs:include schemaLocation="message.xsd"/>
+
+    <!-- Entry - Base class for all entries -->
+    <xs:complexType name="Entry">
+        <xs:annotation>
+            <xs:documentation>Base class for all Entry objects</xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+
+    <!-- NamedEntry - Represents text and literals -->
+    <xs:element name="namedEntry" type="NamedEntry" />
+    <xs:complexType name="NamedEntry">
+        <xs:annotation>
+            <xs:documentation>Represents named and literal entries</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="Entry">
+                <xs:sequence>
+                    <xs:element name="type" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Name of entry</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="literal" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if entry is literal value (name will represent value as well)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Optional value of entry, can be same as Name</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    
+
+    <!-- ObjectEntry - Represents objects (have id) -->
+    <xs:element name="objectEntry" type="ObjectEntry" />
+    <xs:complexType name="ObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Represents objects with id</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="NamedEntry">
+                <xs:sequence>
+                    <xs:element name="uuid" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
+                    <xs:element name="id" type="xs:unsignedLong" minOccurs="0" maxOccurs="1"></xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Attributes">
+        <xs:annotation>
+            <xs:documentation>Can extend Attributes and add platform specific attributes</xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+
+	<!-- Certificate Node Entry  -->
+  <xs:element name="certificateNodeEntry" type="CertificateNodeEntry" />
+  	<xs:complexType name="CertificateNodeEntry">
+		<xs:annotation>
+			<xs:documentation>Certificate Node Object Entry</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="Entry">
+				<xs:all>
+				<xs:element name="key" type="xs:string" minOccurs="0" maxOccurs="1" />
+				<xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <xs:element name="children" type="CertificateNodeEntry"
+                         minOccurs="0" maxOccurs="unbounded" />
+				</xs:all>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+    <!-- PolicyObjectEntry - Base class for all objects -->
+    <xs:element name="policyObjectEntry" type="PolicyObjectEntry" />
+    <xs:complexType name="PolicyObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of policy objects</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="subType" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Object Sub-Type</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="toolTip" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="readOnly" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if user has just read-only privilege</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="domainReadOnly" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if user has just read-only privilege in current domain</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="systemObject" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if system defined object</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="group" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if object is a group</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="valueList" type="NamedEntry" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>List of literals in case of group</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="references" type="ObjectRefs" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Object references in case of groups</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="attributes" type="Attributes" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Platform specific attributes</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+	<xs:element name="pkiPolicyEntry" type="PkiPolicyEntry" />
+	<xs:complexType name="PkiPolicyEntry">
+		<xs:annotation>
+			<xs:documentation>Pki Policy Object Entry</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="BasePolicyEntry">
+				<xs:sequence>
+					<xs:element name="pkiCertificateEntry" type="PkiCertificateEntry"
+						minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<!-- PKI List Entry -->
+	<xs:element name="pkiCertificateEntry" type="PkiCertificateEntry" />
+	<xs:complexType name="PkiCertificateEntry">
+		<xs:annotation>
+			<xs:documentation>Certificate device mapping entry</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ObjectEntry">
+				<xs:all>
+				<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+					 <xs:element name="status" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+					<xs:element name="enrollmentType" minOccurs="1"
+						maxOccurs="1">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="SCEP" />
+								<xs:enumeration value="Manual" />
+								<xs:enumeration value="SelfSignedCertficate" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="caCertificateStatus" minOccurs="1"
+						maxOccurs="1">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="Pending" />
+								<xs:enumeration value="Available" />
+								<xs:enumeration value="NotAvailable"/>
+								<xs:enumeration value="InProgress"/>
+								<xs:enumeration value="NotApplicable"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="identityCertficateStatus" minOccurs="1"
+						maxOccurs="1">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="Pending" />
+								<xs:enumeration value="Available" />
+								<xs:enumeration value="NotAvailable"/>
+								<xs:enumeration value="InProgress"/>
+								<xs:enumeration value="NotApplicable"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="isOutdated" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+				</xs:all>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+    
+    
+
+    <xs:complexType name="SLAMonitorPolicyObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence minOccurs="1" maxOccurs="1">
+                    <xs:element name="slaId" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="securityZoneObject" type="NamedEntry" minOccurs="1" maxOccurs="unbounded" />
+                    <xs:element name="monitoredAddress" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="dataSizeInBytes" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="thresholdInMilliSeconds" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="timeoutInMilliSeconds" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="frequencyInSeconds" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="toS" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="numberOfPackets" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- NetworkObjectEntry - Network Object -->
+    <xs:element name="networkObjectEntry" type="NetworkObjectEntry" />
+    <xs:complexType name="NetworkObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of Network object</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="addressType" minOccurs="0" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="Host" />
+                                <xs:enumeration value="Network" />
+                                <xs:enumeration value="Range" />
+                                <xs:enumeration value="FQDN" />
+                                <xs:enumeration value="Group" />
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AclOrPrefixEntry">
+
+        <xs:sequence>
+            <xs:element name="ACLListorPrefix" minOccurs="1" maxOccurs="1" default="ACL List">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ACL List" />
+                        <xs:enumeration value="Prefix List" />
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:element>
+            <xs:element name="address" type="ObjectEntry" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+
+    </xs:complexType>
+    <xs:complexType name="AclOrPrefixForIpv6Entry">
+
+        <xs:sequence>
+            <xs:element name="ACLListorPrefixIpv6" minOccurs="1" maxOccurs="1" default="ACL">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="ACL" />
+                        <xs:enumeration value="Prefix" />
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:element>
+            <xs:element name="address" type="ObjectEntry" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+
+    </xs:complexType>
+    <xs:complexType name="RouteType">
+        <xs:sequence>
+            <xs:element name="External1" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="External2" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="Internal" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="Local" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="NSSA-External1" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="NSSA-External2" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+    <!-- RouteMapObjectEntry -->
+    <xs:element name="routeMapObjectEntry" type="RouteMapObjectEntry" />
+    <xs:complexType name="RouteMapObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of RouteMapObjectEntry
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="NamedEntry">
+                <xs:sequence>
+                    <xs:element name="routeMapId" type="xs:long" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="seqnumber" type="xs:int" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="redistribution" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="routeSecurityZones" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+
+                    <xs:element name="v4matchaddress" type="AclOrPrefixEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="v4matchnexthop" type="AclOrPrefixEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="v4matchroutesrc" type="AclOrPrefixEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="v6matchaddress" type="AclOrPrefixForIpv6Entry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="v6matchnexthop" type="AclOrPrefixForIpv6Entry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="v6matchroutesrc" type="AclOrPrefixForIpv6Entry" minOccurs="0" maxOccurs="1 " />
+                    <xs:element name="matchmetricroute" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="matchTag" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <!-- match route type is shown as set of check box in UI. for each Name a boolean element is created. -->
+                    <xs:element name="RouteType" type="RouteType" minOccurs="0" maxOccurs="1" />
+
+                    <xs:element name="Bandwidth" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="EIGRPdelay" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="EIGRPreliability" type="xs:int" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="EIGRPeffective" type="xs:int" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="EIGRPMTU" type="xs:long" minOccurs="0" maxOccurs="1" />
+
+                    <xs:element name="metrictype" minOccurs="0" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="Internal" />
+                                <xs:enumeration value="Type-1" />
+                                <xs:enumeration value="Type-2" />
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="bgpMatchAsPathAccessList" type="ObjectEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="bgpMatchCommunity" type="ObjectEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="bgpMatchCommunityExact" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpMatchPolicyList" type="ObjectEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="bgpSetPrependAsPath" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetPrependLastAsPath" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetConvertRouteTagAsPath" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetSpecificCommunity" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetSpecificCommuInternet" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetSpecificCommuAdvertise" type="xs:boolean" minOccurs="0"
+                        maxOccurs="1" />
+                    <xs:element name="bgpSetSpecificCommuExport" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetExistingCommunity" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetCommunityNone" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetAutomaticTag" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetIpAddressPrefixList" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetIpv6AddressPrefixList" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetLocalPreference" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetWeight" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetSpecificIpAdress" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpSetSpecificIpv6Adress" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="BgpUsePeerAdress" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="BgpIpv6UsePeerAdress" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <!-- for bgpSetOrigin. Has 2 options LocalIGP or Incomplete -->
+                    <xs:element name="setOrigin" minOccurs="0" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="Local IGP" />
+                                <xs:enumeration value="Incomplete" />
+                            </xs:restriction>
+                        </xs:simpleType>
+
+                    </xs:element>
+                    <xs:element name="bgpSetNextHop" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="bgpIpv6SetNextHop" type="xs:string" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- PortObjectEntry - Port Object -->
+    <xs:element name="portObjectEntry" type="PortObjectEntry" />
+    <xs:complexType name="PortObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of Port object</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="protocol" type="xs:int" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="icmpCode" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="icmpMsg" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="port" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="homogeneousTCP" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="homogeneousUDP" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="validForSourcePorts" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="validForUserAppURL" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:element name="encapsulationPortObjectEntry" type="EncapsulationPortObjectEntry" />
+    <xs:complexType name="EncapsulationPortObjectEntry">
+    	<xs:annotation>
+            <xs:documentation>Representation of Encapsulation Port object</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="PortObjectEntry">
+                <xs:sequence>
+                	<xs:element name="encapsulationType" type="xs:string"  minOccurs="0" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>    	
+    </xs:complexType>
+
+	<!-- ZoneObjectEntry - Security Zone Object -->
+    <xs:element name="securityZoneObjectEntry" type="SecurityZoneObjectEntry" />
+    <xs:complexType name="SecurityZoneObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of Security Zone Object</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="interface" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="zoneType" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="interfaceGroup" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="IkeObjectEntry">
+    	<xs:annotation>
+    		<xs:documentation>Representation of Ikev1 Proposal entry data</xs:documentation>
+    	</xs:annotation>
+    	<xs:complexContent>
+        <xs:extension base="PolicyObjectEntry">
+            <xs:sequence>
+                <xs:element name="priority" type="xs:int" minOccurs="0" maxOccurs="1" />
+                <xs:element name="hash" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:simpleType>
+            		<xs:restriction base="xs:string">
+            		<xs:enumeration value="MD5" />
+            		<xs:enumeration value="SHA" />
+            		</xs:restriction>
+                </xs:simpleType>
+                </xs:element>
+                
+                <xs:element name="encryption" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:simpleType>
+                	<xs:restriction base="xs:string">
+                    <xs:enumeration value="aes-128" />
+                    <xs:enumeration value="aes-192" />
+                    <xs:enumeration value="aes-256" />
+                    <xs:enumeration value="des" />
+                    <xs:enumeration value="3des" />
+                    </xs:restriction>
+                </xs:simpleType>
+                </xs:element>
+                <xs:element name="authentication" type="xs:string" minOccurs="1" maxOccurs="1" >
+                	<xs:simpleType>
+                		<xs:restriction base="xs:string">
+                			<xs:enumeration value="Preshared Key" />
+                			<xs:enumeration value="Certificate" />
+                		</xs:restriction>
+        			</xs:simpleType>
+            	</xs:element>
+                <xs:element name="dhGroup" type="xs:int" minOccurs="1" maxOccurs="1" >
+                	<xs:simpleType>
+                		<xs:restriction base="xs:int">
+                		<xs:enumeration value="1" />
+                		<xs:enumeration value="2" />
+                		<xs:enumeration value="5" />
+                		<xs:enumeration value="7" />
+                		<xs:enumeration value="14" />
+                		<xs:enumeration value="15" />
+                		<xs:enumeration value="16" />
+                		<xs:enumeration value="19" />
+                		<xs:enumeration value="20" />
+                		<xs:enumeration value="21" />
+                		<xs:enumeration value="24" />
+                		</xs:restriction>
+                	</xs:simpleType>
+                </xs:element>
+                <xs:element name="lifetime" type="xs:long" minOccurs="1" maxOccurs="1" />
+            </xs:sequence>
+        </xs:extension>
+    </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="Ike2ObjectEntry">
+	<xs:annotation>
+		<xs:documentation>Representation of Ikev2 Proposal entry data</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+    <xs:extension base="PolicyObjectEntry">
+        <xs:sequence>
+            <xs:element name="priority" type="xs:int" minOccurs="0" maxOccurs="1" />
+            <xs:element name="encryption" type="xs:string" minOccurs="0" maxOccurs="unbounded" >
+            	<xs:simpleType>
+            	<xs:restriction base="xs:string">
+            	<xs:enumeration value="AES" />
+            	<xs:enumeration value="AES-256" />
+            	<xs:enumeration value="DES" />
+            	<xs:enumeration value="3DES" />
+            	<xs:enumeration value="AES-192" />
+            	<xs:enumeration value="AES-GCM" />
+            	<xs:enumeration value="AES-GCM-256" />
+            	<xs:enumeration value="AES-GCM-192" />
+            	</xs:restriction>
+            	</xs:simpleType>
+    		</xs:element>
+            <xs:element name="integrity" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+            	<xs:simpleType>
+            		<xs:restriction base="xs:string">
+            		<xs:enumeration value="MD5" />
+            		<xs:enumeration value="SHA" />
+            		<xs:enumeration value="SHA512" />
+            		<xs:enumeration value="SHA256" />
+            		<xs:enumeration value="SHA384" />
+            		</xs:restriction>
+            		</xs:simpleType>
+			</xs:element>
+            <xs:element name="prf" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+            	<xs:simpleType>
+            	<xs:restriction base="xs:string">
+            	<xs:enumeration value="MD5" />
+            	<xs:enumeration value="SHA" />
+            	<xs:enumeration value="SHA512" />
+            	<xs:enumeration value="SHA256" />
+            	<xs:enumeration value="SHA384" />
+            	</xs:restriction>
+    			</xs:simpleType>
+        	</xs:element>
+            <xs:element name="dhGroup" type="xs:int" minOccurs="0" maxOccurs="unbounded">
+            	<xs:simpleType>
+            		<xs:restriction base="xs:int">
+            			<xs:enumeration value="1" />
+            			<xs:enumeration value="2" />
+            			<xs:enumeration value="5" />
+            			<xs:enumeration value="14" />
+            			<xs:enumeration value="19" />
+            			<xs:enumeration value="20" />
+            			<xs:enumeration value="21" />
+            			<xs:enumeration value="24" />
+            			</xs:restriction>
+    			</xs:simpleType>	
+    		</xs:element>
+            <xs:element name="lifetime" type="xs:long" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+    <xs:complexType name="Ike1TransformSetObjectEntry">
+    	<xs:annotation>
+    		<xs:documentation>Representation of Ikev1 Transform Set entry data</xs:documentation>
+    	</xs:annotation>
+    	<xs:complexContent>
+	        <xs:extension base="PolicyObjectEntry">
+	            <xs:sequence>
+	                <xs:element name="tunnelMode" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+	                <xs:element name="espEncryption" type="xs:string" minOccurs="1" maxOccurs="1">
+	                <xs:simpleType>
+	            		<xs:restriction base="xs:string">
+	            			<xs:enumeration value="des"/>
+	            			<xs:enumeration value="3des"/>
+	            			<xs:enumeration value="aes-128"/>
+	            			<xs:enumeration value="aes-192"/>
+	            			<xs:enumeration value="aes-256"/>
+	            			<xs:enumeration value="esp-null"/>
+	            		</xs:restriction>
+	                </xs:simpleType>
+	                </xs:element>
+	                <xs:element name="espAuthentication" type="xs:string" minOccurs="1" maxOccurs="1">
+	                <xs:simpleType>
+	                	<xs:restriction base="xs:string">
+							<xs:enumeration value="SHA" />
+	            			<xs:enumeration value="MD5" />
+	                    </xs:restriction>
+	                </xs:simpleType>
+	                </xs:element>
+					<xs:element name="ahAuthentication" type="xs:string" minOccurs="1" maxOccurs="1">
+	                <xs:simpleType>
+	                	<xs:restriction base="xs:string">
+							<xs:enumeration value="SHA" />
+	            			<xs:enumeration value="MD5" />
+	                    </xs:restriction>
+	                </xs:simpleType>
+	                </xs:element>
+	            </xs:sequence>
+	        </xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="Ike2TransformSetObjectEntry">
+    	<xs:annotation>
+    		<xs:documentation>Representation of Ikev2 Transform Set entry data</xs:documentation>
+    	</xs:annotation>
+    	<xs:complexContent>
+	        <xs:extension base="PolicyObjectEntry">
+	            <xs:sequence>
+					<xs:element name="encryptionList" type="xs:string" minOccurs="0" maxOccurs="unbounded" >
+	            	<xs:simpleType>
+		            	<xs:restriction base="xs:string">
+		            	<xs:enumeration value="AES-GCM-256"/>
+		            	<xs:enumeration value="AES-256"/>
+		            	<xs:enumeration value="AES-GCM-192"/>
+		            	<xs:enumeration value="AES-192"/>
+		            	<xs:enumeration value="AES-GCM"/>
+		            	<xs:enumeration value="AES"/>
+		            	<xs:enumeration value="3DES"/>
+		            	<xs:enumeration value="DES"/>
+		            	<xs:enumeration value="AES-GMAC-256"/>
+		            	<xs:enumeration value="AES-GMAC-192"/>
+		            	<xs:enumeration value="AES-GMAC"/>
+		            	<xs:enumeration value="NULL"/>
+	            	</xs:restriction>
+	            	</xs:simpleType>
+	    			</xs:element>
+	            	<xs:element name="integrityList" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+	            	<xs:simpleType>
+	            		<xs:restriction base="xs:string">
+	            		<xs:enumeration value="SHA512"/>
+	            		<xs:enumeration value="SHA384"/>
+	            		<xs:enumeration value="SHA256"/>
+	            		<xs:enumeration value="SHA-1"/>
+	            		<xs:enumeration value="MD5"/>
+	            		<xs:enumeration value="NULL"/>
+	            		</xs:restriction>
+            		</xs:simpleType>
+					</xs:element>
+	            </xs:sequence>
+	        </xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+    
+<xs:complexType name="VPNPkiEnrollment">
+    <xs:annotation>
+    		<xs:documentation>Representation of PKI Data</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+	        <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="caInformation" type="PkiInformationEntry" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="certificateSubject" type="CertificateParametersEntry" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="caKeyEntry" type="PkiServerKeyEntry" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="caRevocationEntry" type="PkiRevocationEntry" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="updateType" minOccurs="0" maxOccurs="1">
+                       <xs:simpleType>
+                          <xs:restriction base="xs:string">
+                             <xs:enumeration value="BlockUpdate"/>
+                             <xs:enumeration value="SelectiveUpdate"/>
+                             <xs:enumeration value="Allowed"/>
+                          </xs:restriction>
+                       </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+    </xs:extension>
+    </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="PkiInformationEntry">
+    <xs:sequence>
+        <xs:element name="enrollmentType" type="xs:string" minOccurs="1" maxOccurs="1">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="SCEP"/>
+                    <xs:enumeration value="Manual"/>
+                    <xs:enumeration value="Self Signed Certificate"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:element>
+        <xs:element name="enrollUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="challengePassword" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="certificateSource">
+         <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="SCEP"/>
+                    <xs:enumeration value="Manual"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:element>
+        <xs:element name="retryPeriod" type="xs:int" minOccurs="1" maxOccurs="1" default="1"/>
+        <xs:element name="retryCount" type="xs:int" minOccurs="1" maxOccurs="1" default="300"/>
+        <xs:element name="fingerprint" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="certificateContent" type="xs:string" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="PkiRevocationEntry">
+<xs:sequence>
+<xs:element name="enableCrl" type="xs:boolean" minOccurs="1" maxOccurs="1"></xs:element>
+<xs:element name="enableCrlCdp" type="xs:boolean" minOccurs="1" maxOccurs="1"></xs:element>
+<xs:element name="enableCrlStatic" type="xs:boolean" minOccurs="1" maxOccurs="1"></xs:element>
+<xs:element name="crlStaticUrl" type="xs:string" minOccurs="0" maxOccurs="5"></xs:element>
+<xs:element name="enableOcsp" type="xs:boolean" minOccurs="1" maxOccurs="1"></xs:element>
+<xs:element name="ocspUrl" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
+<xs:element name="ignoreRevocation" type="xs:boolean" minOccurs="1" maxOccurs="1"></xs:element>
+<xs:element name="evaluationPriority">
+	<xs:simpleType>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CRL" />
+			<xs:enumeration value="OCSP" />
+			<xs:enumeration value="NONE" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="PkiServerKeyEntry">
+<xs:sequence>
+<xs:element name="keyType" type="xs:string" minOccurs="1" maxOccurs="1">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="RSA"/>
+                    <xs:enumeration value="ECDSA"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:element>
+        <xs:element name="keyName" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="keySize" type="xs:int" minOccurs="1" maxOccurs="1" />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="CertificateParametersEntry">
+    <xs:sequence>
+        <xs:element name="includeFQDN" type="xs:string" minOccurs="1" maxOccurs="1">
+        <xs:simpleType>
+                <xs:restriction base="xs:string">
+                <xs:enumeration value="DEVICE_HOSTNAME"/>
+                <xs:enumeration value="NONE"/>
+                <xs:enumeration value="CUSTOM"/>
+                </xs:restriction>
+         </xs:simpleType>
+        </xs:element>
+        <xs:element name="customFqdn" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="commonName" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="includeDeviceIp" type="xs:long" minOccurs="1" maxOccurs="1" />
+        <xs:element name="organizationalUnit" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="organization" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="locality" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="state" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="email" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="includeDeviceSerial" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+</xs:complexType>
+
+
+	<xs:complexType name="Ipv4AddressPoolEntry">
+		<xs:annotation>
+			<xs:documentation>Representation of IPv4 Address Pool entry data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PolicyObjectEntry">
+				<xs:sequence>
+					<xs:element name="ipAddress" type="xs:string" minOccurs="1"
+						maxOccurs="1" />
+					<xs:element name="mask" type="xs:string" minOccurs="0"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Ipv6AddressPoolEntry">
+		<xs:annotation>
+			<xs:documentation>Representation of IPv6 Address Pool entry data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PolicyObjectEntry">
+				<xs:sequence>
+					<xs:element name="ipv6Address" type="xs:string"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="count" type="xs:int" minOccurs="1"
+						maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+ 	<xs:simpleType name="SplitTunnelOption">
+	<xs:restriction base="xs:token">
+		<xs:enumeration value="ALL" />
+		<xs:enumeration value="CUSTOM_ONLY_SPECIFIED" />
+		<xs:enumeration value="CUSTOM_EXCLUDE_SPECIFIED" />
+	</xs:restriction>
+	
+	</xs:simpleType>
+	<xs:element name="splitTunnelSettings" type="SplitTunnelSettings" />
+	<xs:complexType name="SplitTunnelSettings">
+		<xs:sequence>
+			<xs:element name="enableIpv4SplitTunneling" type="SplitTunnelOption" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="enableIpv6SplitTunneling" type="SplitTunnelOption" minOccurs="0" maxOccurs="1" />
+			<xs:element name="includeExcludeAcl" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+			<xs:element name="splitDns" minOccurs="0" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="NO" />
+						<xs:enumeration value="YES" />
+						<xs:enumeration value="CUSTOM_ONLY_SPECIFIED" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="splitDnsList" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="winsAndDnsSettings" type="WinsAndDnsSettings" />
+	<xs:complexType name="WinsAndDnsSettings">
+		<xs:sequence>
+			<xs:element name="primaryDnsServer" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+			<xs:element name="secondaryDnsServer" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+			<xs:element name="primaryWinsServer" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+			<xs:element name="secondaryWinsServer" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+			<xs:element name="defaultDomain" type="xs:string" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="groupPolicyGeneralSettings" type="GroupPolicyGeneralSettings" />
+	<xs:complexType name="GroupPolicyGeneralSettings">
+		<xs:annotation>
+			<xs:documentation>Representation of IPv4 Address Pool entry data</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="Entry">
+				<xs:sequence>
+					<xs:element name="splitTunnelSettings" type="SplitTunnelSettings" minOccurs="0" maxOccurs="1" />
+					<xs:element name="winsAndDnsSettings" type="WinsAndDnsSettings" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="GroupPolicyEntry">
+		<xs:annotation>
+			<xs:documentation>Representation of Group Policy Object entry data</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PolicyObjectEntry">
+				<xs:sequence>
+					<xs:element name="generalSettings" type="GroupPolicyGeneralSettings" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+    
+    <xs:complexType name="PrefixListObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of prefix list entry data
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="prefixSequence" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="permit" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="ipAddress" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="minLength" type="xs:int" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="maxLength" type="xs:int" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="StdACEObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of Standard list entry data
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="networkGroup" type="GroupObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="permit" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="modified" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+     <xs:complexType name="ExtendedACEObjectEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of extended list entry data</xs:documentation>
+        </xs:annotation>
+         <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+       			<xs:sequence>
+              		<xs:element name="sourceList" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+              		<xs:element name="destinationList" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+              		<xs:element name="sourcePortList" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+              		<xs:element name="destinationPortList" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+              		<xs:element name="permit" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+               	 	<xs:element name="logOption" type="xs:int" minOccurs="1" maxOccurs="1" />
+               	 	<xs:element name="logLevel" type="xs:int" minOccurs="1" maxOccurs="1" default="-1" />
+               	 	<xs:element name="logInterval" type="xs:int" minOccurs="0" maxOccurs="1"default="300" />
+        		</xs:sequence>
+        	</xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <!-- DeviceCleanupStatusEntry - Used by Device cleanup -->
+    <xs:element name="DeviceCleanupStatusEntry" type="DeviceCleanupStatusEntry" />
+    <xs:complexType name="DeviceCleanupStatusEntry">
+        <xs:complexContent>
+            <xs:extension base="Entry">
+                <xs:sequence>
+                    <xs:element name="status" type="UniversalMessageStatus" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="uuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <!-- PolicyGroupEntry - Used by Policy-List view (group of policies) -->
+    <xs:element name="policyGroupEntry" type="PolicyGroupEntry" />
+    <xs:complexType name="PolicyGroupEntry">
+        <xs:annotation>
+            <xs:documentation>Represents a collection of Policies (Model used by
+                policy-list-view)
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="status" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="lastModifiedTime" type="xs:unsignedLong" minOccurs="1" maxOccurs="1"/>
+                    <xs:element name="lastModifyingUserName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="attributes" type="Attributes" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Platform specific attributes</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="readOnly" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if user has just read-only privilege</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="domainReadOnly" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if user has just read-only privilege in current domain</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="defaultPgEditable" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if Policy Group is default </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- PolicyGroupStatus - Policy Group Status -->
+    <xs:complexType name="PolicyGroupStatus">
+        <xs:annotation>
+            <xs:documentation>Status of PolicyGroup</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="assignedDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+            <xs:element name="applyingDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+            <xs:element name="uptoDateDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+            <xs:element name="enforcedDomainsList" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="enforcedDomainForSubDomain" type="xs:string" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- DomainEntry - Represents Domain object -->
+    <xs:element name="domainEntry" type="DomainEntry" />
+    <xs:complexType name="DomainEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="parentId" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Represent Object References in Policies -->
+    <xs:complexType name="ObjectRefs">
+        <xs:sequence>
+            <xs:element name="type" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="valueList" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GroupObjectRefs">
+        <xs:complexContent>
+            <xs:extension base="ObjectRefs">
+                <xs:sequence>
+                    <xs:element name="uuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- BasePolicyEntry - Base class for all policies -->
+    <xs:element name="basePolicyEntry" type="BasePolicyEntry" />
+    <xs:complexType name="BasePolicyEntry">
+        <xs:annotation>
+            <xs:documentation>Base class for all Policies</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="subType" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Object Sub-Type</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="enabled" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="readOnly" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="attributes" type="Attributes" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Platform specific attributes</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="mandatory" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if policy belongs to Default category
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="position" type="xs:unsignedLong" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Index of Policy (Example: Rule No)
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- BaseRuleEntry - Base class for all Rules -->
+    <xs:element name="baseRuleEntry" type="BaseRuleEntry" />
+    <xs:complexType name="BaseRuleEntry">
+        <xs:annotation>
+            <xs:documentation>Base class for all Rules</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="BasePolicyEntry">
+                <xs:sequence>
+                    <xs:element name="expiryDate" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="sectionName" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Name of section</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="category" type="CategoryEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="ruleType" type="RuleType" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- BaseOverridePolicyEntry - This is a parent class for all the policies using inheritance by override. -->
+    <xs:element name="baseOverridePolicyEntry" type="BaseOverridePolicyEntry" />
+    <xs:complexType name="BaseOverridePolicyEntry">
+        <xs:annotation>
+            <xs:documentation>Base class for all Override Policy
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="BasePolicyEntry">
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- AccessRuleEntry - Access Control Policy -->
+    <xs:element name="accessRuleEntry" type="AccessRuleEntry" />
+    <xs:complexType name="AccessRuleEntry">
+        <xs:annotation>
+            <xs:documentation>Access Control Policy (Rule)</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="BaseRuleEntry">
+                <xs:sequence>
+                    <xs:element name="direction" minOccurs="0" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="In" />
+                                <xs:enumeration value="Out" />
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="action" minOccurs="0" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="Permit" />
+                                <xs:enumeration value="Deny" />
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="timeRange" type="ObjectEntry" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="interfaces" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="users" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="sources" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="sourceTags" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="destinations" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="destinationTags" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="services" type="ObjectRefs" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="hitCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="natRuleEntry" type="NatRuleEntry" />
+    <xs:complexType name="NatRuleEntry">
+        <xs:complexContent>
+            <xs:extension base="BaseRuleEntry">
+                <xs:sequence>
+                    <xs:element name="sourceInterface" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="destinationInterface" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="natType" type="NATType" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="user" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="originalSource" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="originalDestination" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="originalService" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="translatedSource" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="translatedDestination" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="translatedService" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="options" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="unidirectional" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="section" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="interfaceInTransSource" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="patOptions" type="PatOptions" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="patPool" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="netToNet" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="routeLookup" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="noProxyArp" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="DNS" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="interfaceIPv6" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="fallthrough" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="jobDeviceInfoEntry" type="JobDeviceInfoEntry" />
+    <xs:complexType name="JobDeviceInfoEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="deviceId" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="deviceUuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="deviceName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="mdfType" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="outputDir" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="deploymentType" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="dummy" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="status" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="rollbackConfigVersion" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="transcriptId" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="cnsJobId" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="deviceType" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="dirtyActivityIds" type="xs:unsignedLong" minOccurs="1" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="deploymentJobEntry" type="DeploymentJobEntry" />
+    <xs:complexType name="DeploymentJobEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="creator" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="createTime" type="xs:date" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="createTimeStamp" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="currentUser" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="lastActionTime" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="scheduleTime" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="taskId" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="originalJobID" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="state" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="statusMsg" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="totalDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="toBeDeployedCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="completedDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="successDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="errorDeviceCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="sendStatusNotification" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="approverEmail" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="senderEmail" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="emailsForJobDone" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="jobType" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="scheduleId" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="jobDeviceInfoList" type="JobDeviceInfoEntry" minOccurs="1" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+    <xs:simpleType name="OSType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="ios" />
+            <xs:enumeration value="fwsm" />
+            <xs:enumeration value="asa" />
+            <xs:enumeration value="ips" />
+            <xs:enumeration value="pix" />
+            <xs:enumeration value="sfsensor" />
+            <xs:enumeration value="ngfw" />
+            <xs:enumeration value="undefined" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DeviceType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="NGIPS" />
+            <xs:enumeration value="NGFW" />
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:simpleType name="MgmtType">
+        <xs:restriction base="xs:byte">
+            <xs:minInclusive value="0" />
+            <xs:maxInclusive value="7" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FwOSMode">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="OS_MODE_NOT_APPLICABLE" />
+            <xs:enumeration value="OS_MODE_TRANSPARENT" />
+            <xs:enumeration value="OS_MODE_ROUTED" />
+            <xs:enumeration value="OS_MODE_MIXED" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FwOSContext">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="OS_CONTEXT_NOT_APPLICABLE" />
+            <xs:enumeration value="OS_CONTEXT_SINGLE" />
+            <xs:enumeration value="OS_CONTEXT_MULTI" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CallHomeModeType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="CALLHOME_MODE_NOT_APPLICABLE" />
+            <xs:enumeration value="CALLHOME_MODE_AUS" />
+            <xs:enumeration value="CALLHOME_MODE_CNS" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DeviceState">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="STATE_DELETED_IN_DCR" />
+            <xs:enumeration value="STATE_ANCESTOR_DELETED_IN_DCR" />
+            <xs:enumeration value="STATE_NOT_DEPLOYABLE" />
+            <xs:enumeration value="STATE_BROKEN_ON_UPGRADE" />
+            <xs:enumeration value="STATE_VC_NEW" />
+            <xs:enumeration value="STATE_NO_CALLHOME_SERVER" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="HpmMonitorSettings">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="HPM_UNMONITORED" />
+            <xs:enumeration value="HPM_ACTIVELY_MONITORED" />
+            <xs:enumeration value="HPM_NON_ACTIVELY_MONITORED" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ClusterModeType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="CLUSTER_NONE" />
+            <xs:enumeration value="CLUSTER_FAILOVER_TYPE" />
+            <xs:enumeration value="CLUSTER_LOADBALANCING_TYPE" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="HttpMode">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="DEFAULT" />
+            <xs:enumeration value="HTTP" />
+            <xs:enumeration value="HTTPS" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Lightweight com.cisco.nm.vms.device.Credentials -->
+    <xs:element name="deviceCredentialsEntry" type="DeviceCredentialsEntry" />
+    <xs:complexType name="DeviceCredentialsEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="primaryUser" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="primaryPassword" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="primaryEnablePassword" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="httpUserName" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="httpPassword" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="httpEnablePassword" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="httpServerPort" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="httpsServerPort" type="xs:unsignedInt" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="defaultHttpMode" type="HttpMode" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="httpMode" type="HttpMode" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="httpUsesPrimaryCredentials" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="encryptionFlag" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="certCommonName" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV2Ro" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV2Rw" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV3User" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV3Password" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV3AuthAlgo" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV3PrivacyPw" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV3PrivacyAlgo" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="snmpV3EngineId" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="rxBmUser" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="rxBmPassword" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="lastUpdateTime" type="xs:dateTime" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Lightweight com.cisco.nm.vms.device.BaseDevice -->
+    <xs:element name="deviceEntry" type="DeviceEntry" />
+    <xs:complexType name="DeviceEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="readOnly" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>True if user has just read-only privilege</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="mgmtIpAddress" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="hostName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="uiName" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="domainName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="sysObjId" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="mdfType" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="mdfId" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="managementType" type="MgmtType" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="osType" type="OSType" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="targetOsVersion" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="runningOsVersion" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="ancOsType" type="OSType" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="fwOsMode" type="FwOSMode" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="fwOsMultiplicity" type="FwOSContext" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="callHomeMode" type="CallHomeModeType" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="callHomeMgrId" type="xs:unsignedLong" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="isDynamicIp" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="isComposite" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="isContained" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="isIPSEnabled" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="state" type="DeviceState" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="isMonitored" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="hasFailoverLicense" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="supportIsGeneric" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="hpmSettings" type="HpmMonitorSettings" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="clusterMode" type="ClusterModeType" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="credentials" type="DeviceCredentialsEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="domainUuid" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="isIpAddressSpecified" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="containerType" type="ContainerType" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="isDeviceInCluster" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="editUserName" type="xs:string" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Cluster Node Status Type -->
+    <xs:simpleType name="NodeStatusType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NODE_ADDED" />
+            <xs:enumeration value="NODE_DELETED" />
+            <xs:enumeration value="NODE_IN_SYNC" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:element name="ngfwClusterSummaryEntry" type="NgfwClusterSummaryEntry" />
+    <xs:complexType name="NgfwClusterSummaryEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="nodeStatusType" type="NodeStatusType" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeUnitName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeChassisUrl" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeId" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeUuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeIp" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeSerialNumber" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeErrorCode" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="nodeErrorReason" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+
+    <!-- NAT Rules -->
+
+    <!-- NAT Type -->
+    <xs:simpleType name="NATType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Static" />
+            <xs:enumeration value="Dynamic" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- NAT PAT Options -->
+    <xs:complexType name="PatOptions">
+        <xs:sequence>
+            <xs:element name="patPoolAddress" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+            <xs:element name="interfacePat" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="roundRobin" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+            <xs:element name="flat" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+            <xs:element name="extended" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+            <xs:element name="includeReserve" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Base NAT Rule -->
+    <xs:element name="baseNatRuleEntry" type="BaseNatRuleEntry" />
+    <xs:complexType name="BaseNatRuleEntry">
+        <xs:complexContent>
+            <xs:extension base="BaseRuleEntry">
+                <xs:sequence>
+                    <xs:element name="sourceInterface" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="destinationInterface" type="ObjectEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="natType" type="NATType" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="source" minOccurs="1" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="originalSource" type="ObjectEntry" minOccurs="1" maxOccurs="1" />
+                                <xs:element name="translatedSource" type="ObjectEntry" minOccurs="0"
+                                    maxOccurs="1" />
+                                <xs:element name="interfaceInTransSource" type="xs:boolean" minOccurs="0"
+                                    maxOccurs="1" />
+                                <xs:element name="patOptions" type="PatOptions" minOccurs="0" maxOccurs="1" />
+                                <xs:element name="translatedSources" type="NamedEntry" minOccurs="0"
+                                    maxOccurs="unbounded" />
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="patPool" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="netToNet" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="routeLookup" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="noProxyArp" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="DNS" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="unidirectional" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="interfaceIPv6" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="section" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="originalService" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="translatedService" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="originalDestination" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="translatedDestination" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="options" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Manual NAT Rule -->
+    <xs:element name="manualNatRuleEntry" type="ManualNatRuleEntry" />
+    <xs:complexType name="ManualNatRuleEntry">
+        <xs:complexContent>
+            <xs:extension base="NatRuleEntry">
+                <xs:sequence>
+                    <xs:element name="interfaceInOrigDestination" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                     <xs:element name="protocol" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="realPort" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="mappedPort" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Auto NAT Rule -->
+    <xs:element name="objectNatRuleEntry" type="ObjectNatRuleEntry" />
+    <xs:complexType name="ObjectNatRuleEntry">
+        <xs:complexContent>
+            <xs:extension base="NatRuleEntry">
+                <xs:sequence>
+                    <xs:element name="protocol" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="realPort" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="mappedPort" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="geolocationObjectEntry" type="GeolocationObjectEntry" />
+    <xs:complexType name="GeolocationObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="countryCode" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="continentId" type="xs:unsignedLong" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="continentCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="countryCount" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="isoFlag" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="appFilterObjectEntry" type="AppFilterObjectEntry" />
+    <xs:complexType name="AppFilterObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="filter" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>only used when type = "filter"
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="productivities" maxOccurs="unbounded" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="productivity" type="xs:int" minOccurs="1" maxOccurs="1">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            Business Relevance
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="risks" maxOccurs="unbounded" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="risk" type="xs:int" minOccurs="1" maxOccurs="1"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="tags" maxOccurs="unbounded" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="tagId" type="xs:int" minOccurs="1" maxOccurs="1"></xs:element>
+                                <xs:element name="tagType" minOccurs="1" maxOccurs="1">
+                                    <xs:simpleType>
+                                        <xs:restriction base="xs:string">
+                                            <xs:enumeration value="category"></xs:enumeration>
+                                            <xs:enumeration value="tag"></xs:enumeration>
+                                        </xs:restriction>
+                                    </xs:simpleType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="appType" minOccurs="1" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="app"></xs:enumeration>
+                                <xs:enumeration value="filter"></xs:enumeration>
+                                <xs:enumeration value="object"></xs:enumeration>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="types" maxOccurs="unbounded" minOccurs="0">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="type" minOccurs="1" maxOccurs="1">
+                                    <xs:simpleType>
+                                        <xs:restriction base="xs:string">
+                                            <xs:enumeration value="isClient"></xs:enumeration>
+                                            <xs:enumeration value="isServer"></xs:enumeration>
+                                            <xs:enumeration value="isWebApp"></xs:enumeration>
+                                        </xs:restriction>
+                                    </xs:simpleType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="urlObjectEntry" type="UrlObjectEntry" />
+    <xs:complexType name="UrlObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="category" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>category uuid
+                                either category or reputation (or both) must be defined
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="reputation" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>reputation uuid
+                                either category or reputation (or both) must be defined
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="urlType" minOccurs="1" maxOccurs="1">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="literal">
+                                    <xs:annotation>
+                                        <xs:documentation> inline URL entry</xs:documentation>
+                                    </xs:annotation>
+                                </xs:enumeration>
+                                <xs:enumeration value="cloud">
+                                    <xs:annotation>
+                                        <xs:documentation> category or reputation (or both)
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                </xs:enumeration>
+                                <xs:enumeration value="object"></xs:enumeration>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="idReferrerObjectEntry" type="IdReferrerObjectEntry" />
+    <xs:complexType name="IdReferrerObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="referrerId" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>
+                            ID of the referrer
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="referrerType" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>
+                            Type of the referrer
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="referrerName" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>
+                            Name of the referrer
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>                                       
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    
+    
+    <xs:element name="freeFormObjectEntry" type="FreeFormObjectEntry" />
+    <xs:complexType name="FreeFormObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="dimension" type="xs:int" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Value of the dimension can be 0 or 1</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>                                      
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:element name="flexConfigObjectEntry" type="FlexConfigObjectEntry" />
+    <xs:complexType name="FlexConfigObjectEntry">
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="body" type="xs:string" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>content of the varriable</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>   
+                    <xs:element name="append" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>append or prepend to FMC generated CLI</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="flexConfigVarriable" type="FlexConfigVarriable" minOccurs="1" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>List of all flexConfig varriables</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>     
+                    <xs:element name="deployEveryTime" type="xs:boolean" minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>CLI needs to deployed every time or just one time</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    
+    <xs:element name="flexConfigVarriable" type="FlexConfigVarriable" />
+	<xs:complexType name="FlexConfigVarriable">
+		<xs:complexContent>
+			<xs:extension base="PolicyObjectEntry">
+				<xs:annotation>
+					<xs:documentation>Represent flexConfig varriable</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="varriableType" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Type of the flexConfig varriable</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:token">
+								<xs:enumeration value="SYSTEM" />
+								<xs:enumeration value="FREEFORM" />
+								<xs:enumeration value="NETWORK" />
+								<xs:enumeration value="PORT" />
+								<xs:enumeration value="SECURITYZONE" />
+								<xs:enumeration value="STD_ACL" />
+								<xs:enumeration value="EXD_ACL" />
+								<xs:enumeration value="ROUTEMAP" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>					
+					<xs:element name="bbName" type="xs:string" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Name of referred BB</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="varriableValue" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Value of the varriable</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="dimension" type="xs:string" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Dimension of the varriable</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="canOverride" type="xs:boolean" minOccurs="1" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>BB can be overridden or not</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+
+
+	</xs:complexType>
+
+    <xs:element name="validationMessageList" type="ValidationMessageList" />
+    <xs:complexType name="ValidationMessageList">
+        <xs:annotation>
+            <xs:documentation>List of validationMessage info,errors,warnings
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="infos" type="ValidationMessage" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Info validation message</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="warnings" type="ValidationMessage" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Warning validation message</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="errors" type="ValidationMessage" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Error validation message</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="validationMessage" type="ValidationMessage" />
+    <xs:complexType name="ValidationMessage">
+        <xs:annotation>
+            <xs:documentation>Represent the generic Validation Message
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="message" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Detail validation message</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="type" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>type of the message
+                        BASIC,BASIC_RULE,RULE_CONFIG_DETECTION
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="level" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Type of the Message</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:token">
+                        <xs:enumeration value="INFO" />
+                        <xs:enumeration value="WARNING" />
+                        <xs:enumeration value="ERROR" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RuleValidationMessage">
+        <xs:annotation>
+            <xs:documentation>Represent the generic Validation Message
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ValidationMessage">
+                <xs:sequence>
+                    <xs:element name="uuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="devicePolicyValidationMessage" type="DevicePolicyValidationMessage" />
+ <xs:complexType name="DevicePolicyValidationMessage">
+    <xs:annotation>
+        <xs:documentation>Represent the Validation Messages for a Policy
+        </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+        <xs:element name="deviceUUID" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element name="deviceName" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+
+        <xs:element name="maxErrorStatus" type="xs:string" minOccurs="1" maxOccurs="1" />
+
+        <xs:element name="policyName" type="xs:string" minOccurs="1" maxOccurs="1" />
+        <xs:element name="policyUuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+        <xs:element name="policyType" type="xs:string" minOccurs="1" maxOccurs="1" />
+        <xs:element name="validationMessages" minOccurs="0" maxOccurs="unbounded">
+	            <xs:complexType>
+	                <xs:sequence>
+	                    <xs:element name="policyTypeKey" type="xs:string"/>
+	                    <xs:element name="validationMessageList" minOccurs="1" maxOccurs="1" type="ValidationMessageList"/>
+	                </xs:sequence>
+	            </xs:complexType>
+	        </xs:element>
+
+
+
+    </xs:sequence>
+</xs:complexType>
+
+
+
+
+    <xs:complexType name="PolicyValidationMessageEntry">
+	    <xs:annotation>
+	        <xs:documentation>Represent the Validation Messages for a Policy
+	        </xs:documentation>
+	    </xs:annotation>
+	    <xs:sequence>
+	        <xs:element name="policyName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	        <xs:element name="policyUuid" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	        <xs:element name="policyType" type="xs:string" minOccurs="1" maxOccurs="1"/>
+	        <xs:element name="validationMessages" minOccurs="0" maxOccurs="unbounded">
+	            <xs:complexType>
+	                <xs:sequence>
+	                    <xs:element name="policyTypeKey" type="xs:string"/>
+	                    <xs:element name="validationMessageList" minOccurs="1" maxOccurs="1" type="ValidationMessageList"/>
+	                </xs:sequence>
+	            </xs:complexType>
+	        </xs:element>
+	    </xs:sequence>
+	</xs:complexType>
+
+    <xs:simpleType name="CategoryType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SECTION" />
+            <xs:enumeration value="HEADER" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="RuleType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="HEADER" />
+            <xs:enumeration value="SECTION" />
+            <xs:enumeration value="RULE" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="categoryEntry" type="CategoryEntry" />
+    <xs:complexType name="CategoryEntry">
+        <xs:complexContent>
+            <xs:extension base="ObjectEntry">
+                <xs:sequence>
+                    <xs:element name="categorysize" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="categoryType" type="CategoryType" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="categorydescription" type="xs:string" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="expanded" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="categoryStart" type="xs:unsignedInt" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="breadCrumb" type="xs:string" minOccurs="1" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+	<xs:element name="deviceFeatureInfo" type="DeviceFeatureInfo" />
+	<xs:complexType name="DeviceFeatureInfo">
+		<xs:sequence>
+			<xs:element name="deviceUUID" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="deviceMode" type="DeviceModeType"
+				minOccurs="1" maxOccurs="1" default="routed" />
+			<xs:element name="deviceModelNo" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="interfaceCapability" type="InterfaceCapabilityInfo"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="deviceClusterSupport" type="DeviceClusterSupportInfo"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="isClusteredDevice" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="isHADevice" type="xs:boolean" 
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="interfacePgUUID" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="inlineSetPgUUID" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="deviceFtwCapable" type="xs:boolean" 
+				minOccurs="1" maxOccurs="1" />
+			<!-- Othe kind of attributes can be added here like NAT etc. -->
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="interfaceCapabilityInfo" type="InterfaceCapabilityInfo" />
+	<xs:complexType name="InterfaceCapabilityInfo">
+		<xs:sequence>
+			<xs:element name="deviceMode" type="DeviceModeType"
+				minOccurs="1" maxOccurs="1" default="routed" />
+
+			<!-- Max no of interface supported in device -->
+			<xs:element name="maxInterfaceCounts" type="xs:unsignedInt"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Max no of failover interface policy number in device -->
+			<xs:element name="maxFailoverInterfaces" type="xs:unsignedInt"
+				minOccurs="0" maxOccurs="1" />
+				
+			<!-- Max no of vlan interface supported in device -->
+			<xs:element name="maxNgfwVlanCount" type="xs:unsignedInt"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Max no of Number of named mgmt Interfaces supported in device -->
+			<xs:element name="namedMgmInterfaceCount" type="xs:unsignedInt"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Can user create sub interface on mgmt interface -->
+			<xs:element name="subInterfaceOnMgmtInterface" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Can user convert default mgmt interface to traffic interface -->
+			<xs:element name="defaultMgmToTrafficInterface" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Can user convert traffic interface to mgmt interface -->
+			<xs:element name="trafficToMgmtInterface" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Can user configure ipv4 -->
+			<xs:element name="ipv4ConfigOnInterface" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Can user create bridge Group -->
+			<xs:element name="bridgeGroupInterfaces" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Can user create pppoe ipv4 config -->
+			<xs:element name="pppoeConfigOnInterfaces" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- max no of non-mgmt interafces -->
+			<xs:element name="maxNamedNonMgmtInterfaceCount" type="xs:unsignedInt"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- jumboFrame size -->
+			<xs:element name="jumboFrame" type="xs:unsignedInt"
+				minOccurs="1" maxOccurs="1" />
+				
+			<!-- Device Model Number -->
+			<xs:element name="deviceModelNo" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				
+			<!-- Can user create Redundant Interface -->
+			<xs:element name="redundantInterfaces" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+				
+			<!-- Can user create Ether Channel Interface -->
+			<xs:element name="etherChannelInterfaces" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+				
+			<!-- Is VxLan Feature Support is there or not -->
+			<xs:element name="vxLanSupported" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />
+
+			<!-- Othe kind of attributes can be added here -->
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:simpleType name="DeviceModeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="transparent" />
+			<xs:enumeration value="routed" />
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:element name="MessageEntry" type="UniversalMessageEntry" />
+    <xs:complexType name="UniversalMessageEntry">
+        <xs:complexContent>
+            <xs:extension base="Entry">
+                <xs:sequence>
+                    <xs:element name="id" type="Uuid" minOccurs="0"/>
+                    <xs:element name="category" type="Category"/>
+                    <xs:element name="body" type="ExtendedMessage"/>
+                    <xs:element name="user" type="Uuid" minOccurs="0"/>
+                    <xs:element name="domain" type="Uuid" minOccurs="0"/>
+                    <xs:element name="scope" type="Scope" minOccurs="0"/>
+                    <xs:element name="type" type="UniversalMessageType" minOccurs="0"/>
+                    <xs:element name="status" type="UniversalMessageStatus" minOccurs="0"/>
+                    <xs:element name="action" type="Action" minOccurs="0"/>
+                    <xs:element name="data" type="Data" minOccurs="0"/>
+                    <xs:element name="progress" type="Progress" minOccurs="0"/>
+                    <xs:element name="permanent" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="sticky" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="silent" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="restart" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="devices" type="Uuid" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="appliance" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="remove" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+                 </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- AsPAthEntry -->
+    <xs:element name="asPathEntry" type="AsPathEntry" />
+    <xs:complexType name="AsPathEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of AsPathEntry
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="NamedEntry">
+                <xs:sequence>
+                    <xs:element name="asPathId" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="seqnumber" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="aspathaclno" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="permit" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <!-- aspathlineno is used for regular expression match field. -->
+                    <xs:element name="aspathlineno" type="xs:string" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- CommunityListEntry -->
+    <xs:element name="communityListEntry" type="CommunityListEntry" />
+    <xs:complexType name="CommunityListEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of CommunityListEntry
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="NamedEntry">
+                <xs:sequence>
+                    <xs:element name="communityId" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="seqnumber" type="xs:long" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="communitylisttype" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="permit" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="standardcommunities" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <!-- expandedexpression is used for regular expression match. -->
+                    <xs:element name="expandedexpression" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="standardinternet" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="standardnoadvertise" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="standardnoexport" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- PolicyListEntry -->
+    <xs:element name="policyListEntry" type="PolicyListEntry" />
+    <xs:complexType name="PolicyListEntry">
+        <xs:annotation>
+            <xs:documentation>Representation of PolicyListEntry
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="PolicyObjectEntry">
+                <xs:sequence>
+                    <xs:element name="permit" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="seqnumber" type="xs:long" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="PolicyListId" type="xs:long" minOccurs="1" maxOccurs="1" />
+                    <xs:element name="policySecurityZones" type="NamedEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="policymatchaddress" type="AclOrPrefixEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="policymatchnexthop" type="AclOrPrefixEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="policymatchroutesource" type="AclOrPrefixEntry" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="policymatchaspath" type="ObjectEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="policymatchcommunity" type="ObjectEntry" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="policymatchexactcheck" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+                    <xs:element name="policymatchmetric" type="xs:string" minOccurs="0" maxOccurs="1" />
+                    <!-- policymatchtag is used for regular expression match. -->
+                    <xs:element name="policymatchtag" type="xs:string" minOccurs="0" maxOccurs="1" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+	
+    <xs:complexType name="SaveDomainConfigEntry">
+       <xs:sequence>
+       		<xs:element name="addedDomain" type="DomainEntry" minOccurs="0" maxOccurs="unbounded" />
+       		<xs:element name="modifiedDomain" type="DomainEntry" minOccurs="0" maxOccurs="unbounded" />
+       		<xs:element name="deletedDomainUUID" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+       		<xs:element name="movedDevice" type="EntityMoveRequestData" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+    <xs:complexType name="SaveDomainConfigRequest">
+    	<xs:complexContent>
+    		<xs:extension base="Entry">
+    			<xs:sequence>
+    				<xs:element name="saveDomainConfigEntry" type="SaveDomainConfigEntry" minOccurs="1" maxOccurs="1"></xs:element>
+    			</xs:sequence>
+    		</xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="SetCurrentDomainRequest">
+    	<xs:complexContent>
+    		<xs:extension base="Entry">
+    			<xs:sequence>
+    				<xs:element name="domainEntry" type="DomainEntry" minOccurs="1" maxOccurs="1"></xs:element>
+    			</xs:sequence>
+    		</xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+
+ 	<xs:simpleType name="EntityType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="DEVICE" />
+            <xs:enumeration value="CONTAINER" />
+        </xs:restriction>
+    </xs:simpleType>
+
+ 	<xs:element name="entityMoveRequestData" type="EntityMoveRequestData" />
+    <xs:complexType name="EntityMoveRequestData">
+       <xs:sequence>
+       		<xs:element name="type" type="EntityType" minOccurs="1" maxOccurs="1" />
+       		<xs:element name="entityUuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+      		<xs:element name="sourceDomainUuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+      		<xs:element name="destinationDomainUuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+       		<xs:element name="pgUuid" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="entityMoveRequestDataList" type="EntityMoveRequestDataList" />
+    <xs:complexType name="EntityMoveRequestDataList">
+       <xs:sequence>
+       		<xs:element name="data" type="EntityMoveRequestData" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:element name="entityValidateResponseEntry" type="EntityValidateResponseEntry" />
+	<xs:complexType name="EntityValidateResponseEntry">
+		<xs:complexContent>
+			<xs:extension base="Entry">
+				<xs:sequence>
+					<xs:element name="uuid" type="xs:string" minOccurs="1" maxOccurs="1" />
+					<xs:element name="pgType" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="entityValidateResponseDataList" type="EntityValidateResponseDataList" />
+    <xs:complexType name="EntityValidateResponseDataList">
+       <xs:sequence>
+       		<xs:element name="data" type="EntityValidateResponseEntry" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+     <xs:simpleType name="ContainerType">
+		<xs:restriction base="xs:token">
+		<xs:enumeration value="NONE" />
+		<xs:enumeration value="STACK" />
+		<xs:enumeration value="CLUSTER" />
+		<xs:enumeration value="GROUP" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:element name="deviceClusterSupportInfo" type="DeviceClusterSupportInfo" />
+	<xs:complexType name="DeviceClusterSupportInfo">
+		<xs:sequence>
+			<xs:element name="clusterName" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				
+			<xs:element name="clusterNodeName" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				
+			<xs:element name="clusterNodeRole" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				
+			<!-- isSecondaryDeviceOnUM is for checking the secondary device on cluster -->
+			<xs:element name="isSecondaryDeviceOnUM" type="xs:boolean"
+				minOccurs="1" maxOccurs="1" />	
+
+			<!-- Othe kind of attributes can be added here -->
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:simpleType name="ActionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ngfw_failover" />
+			<xs:enumeration value="ngfw_nofailover" />
+			<xs:enumeration value="ngfw_switchmaster" />
+			<xs:enumeration value="netmod_change_event" />
+			<xs:enumeration value="node_status_event" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="Level">
+		<xs:restriction base="xs:token">
+		<xs:enumeration value="WARNING" />
+		<xs:enumeration value="ERROR" />
+		<xs:enumeration value="INFO" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:element name="deviceOperationStatus" type="DeviceOperationStatus" />
+	<xs:complexType name="DeviceOperationStatus">
+		<xs:complexContent>
+			<xs:extension base="ObjectEntry">
+				<xs:sequence>
+					<xs:element name="task" type="ActionType" minOccurs="0"
+						maxOccurs="1" />
+					<xs:element name="status" type="UniversalMessageStatus"
+						minOccurs="0" maxOccurs="1" />
+					<xs:element name="tooltipMessage" type="xs:string"
+						minOccurs="0" maxOccurs="1" />
+					<xs:element name="level" type="Level" minOccurs="0"
+						maxOccurs="1" />
+					<xs:element name="configuredRoleInHA" type="xs:string"
+						minOccurs="0" maxOccurs="1" >
+						<xs:annotation>
+							<xs:documentation>Specifies if Primary/Secondary</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="currentRoleInHA" type="xs:string"
+						minOccurs="0" maxOccurs="1">
+						<xs:annotation>
+							<xs:documentation>Specifies if Active/Standby</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+    
+    
+    <xs:element name="flexConfigPolicyEntry" type="FlexConfigPolicyEntry" />
+    <xs:complexType name="FlexConfigPolicyEntry">
+        <xs:complexContent>
+            <xs:extension base="BaseOverridePolicyEntry">
+                <xs:sequence>
+                    <xs:element name="prepend" type="FlexConfigObjectEntry" minOccurs="0" maxOccurs="unbounded" >
+                    	<xs:annotation>
+                            <xs:documentation>prepend data</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="append" type="FlexConfigObjectEntry" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>append data</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>                    
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:complexType name="FileObjectEntry">
+    	<xs:annotation>
+    		<xs:documentation>Representation of File Object entry data</xs:documentation>
+    	</xs:annotation>
+    	<xs:complexContent>
+	        <xs:extension base="PolicyObjectEntry">
+	             <xs:sequence>
+                <xs:element name="fileType" minOccurs="1" maxOccurs="1" >
+                <xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="AnyConnectProfile" />
+								<xs:enumeration value="AnyConnectImage" />
+							</xs:restriction>
+						</xs:simpleType>
+			    </xs:element>
+                <xs:element name="fileName" type="xs:string" minOccurs="1" maxOccurs="1" />  
+                <xs:element name="fileAdded" type="xs:boolean" minOccurs="0" maxOccurs="1" />               
+            </xs:sequence>
+	        </xs:extension>
+    	</xs:complexContent>
+    </xs:complexType>
+    
+</xs:schema>

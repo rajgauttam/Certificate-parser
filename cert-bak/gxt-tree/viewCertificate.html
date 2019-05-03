@@ -1,0 +1,22 @@
+<div style="margin: 15px;">
+  <tpl for='.'>
+      <div> {#}. <span style=" font-weight: bold;">{key} {value}</span> </div><hr> 
+      <div style="padding: 10px;">
+      	<div style="background-color:rgb(220, 222, 224);">
+	        <tpl for='children'>
+	        	<p>
+	        	<div>
+	        	  <div style="display: inline-block; width: 30%; padding: 5px 5px 5px 15px;">
+	        		 <span>{key}</span> 
+	        	  </div>
+	        	 <div style="width: 60%;display: inline-block; padding :5px;">
+	        	    <span > {value} </span>
+	        	 </div>
+	        	
+	        	</div>
+	        	</p>
+	        </tpl>
+	     </div>
+       </div>
+  </tpl>
+</div>
